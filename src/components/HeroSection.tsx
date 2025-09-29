@@ -1,10 +1,8 @@
 import { Button } from "@/components/ui/enhanced-button";
 import { CheckCircle, Upload, Shield, Search } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import heroBackground from "@/assets/hero-background.jpg";
 
-const HeroSection = () => {
-  const navigate = useNavigate();
+const HeroSection = ({ onGetStarted }) => {
 
   return (
     <section 
@@ -53,17 +51,18 @@ const HeroSection = () => {
               variant="hero"
               size="xl"
               className="w-full sm:w-auto"
-              onClick={() => navigate("/login")}
+              onClick={onGetStarted}
             >
               <Shield className="w-5 h-5 mr-2" />
-              Verify Certificate
+              Get Started
             </Button>
             <Button
               variant="glass"
               size="xl"
               className="w-full sm:w-auto"
+              onClick={onGetStarted}
             >
-              View Demo
+              Upload Certificate
             </Button>
           </div>
 
@@ -94,20 +93,10 @@ const HeroSection = () => {
               <Button
                 variant="outline"
                 className="w-full border-primary/30 hover:bg-primary/5"
-                onClick={() => {
-                  // Create file input programmatically
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*,.pdf';
-                  input.onchange = () => {
-                    // Handle file upload logic here
-                    navigate('/login');
-                  };
-                  input.click();
-                }}
+                onClick={onGetStarted}
               >
                 <Upload className="w-4 h-4 mr-2" />
-                Choose File
+                Get Started
               </Button>
             </div>
           </div>

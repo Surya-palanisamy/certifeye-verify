@@ -2,11 +2,9 @@ import { Button } from "@/components/ui/enhanced-button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Shield, X } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-const Navigation = () => {
+const Navigation = ({ onGetStarted }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const navigate = useNavigate();
 
   const navItems = [
     { name: "Features", href: "#features" },
@@ -51,14 +49,8 @@ const Navigation = () => {
           {/* Desktop Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
             <Button
-              variant="ghost"
-              onClick={() => navigate("/login")}
-            >
-              Sign In
-            </Button>
-            <Button
               variant="hero"
-              onClick={() => navigate("/login")}
+              onClick={onGetStarted}
             >
               Get Started
             </Button>
@@ -96,21 +88,11 @@ const Navigation = () => {
 
                 <div className="pt-6 space-y-3 border-t border-secondary">
                   <Button
-                    variant="outline"
-                    className="w-full"
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate("/login");
-                    }}
-                  >
-                    Sign In
-                  </Button>
-                  <Button
                     variant="hero"
                     className="w-full"
                     onClick={() => {
                       setIsOpen(false);
-                      navigate("/login");
+                      onGetStarted();
                     }}
                   >
                     Get Started
