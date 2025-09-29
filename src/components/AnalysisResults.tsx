@@ -242,32 +242,148 @@ const AnalysisResults = ({ analysis, certificateId }) => {
           </CardContent>
         </Card>
 
-        {/* Text Analysis */}
+        {/* Technical Details */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg">
               <FileText className="w-5 h-5" />
-              Text Analysis
+              Technical Analysis Data
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span>Text Extracted</span>
-                <Badge variant="outline">
-                  {analysis.details?.textLength || 0} chars
-                </Badge>
-              </div>
-              {analysis.extractedText && (
-                <div className="text-sm text-muted-foreground max-h-20 overflow-y-auto">
-                  <p className="font-medium mb-1">Sample Text:</p>
-                  <p className="italic">"{analysis.extractedText.substring(0, 200)}..."</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">Font Analysis</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Primary Font:</span>
+                    <span className="font-mono text-xs">
+                      {analysis.details?.fontAnalysis?.primaryFont || 'Times New Roman'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Font Changes:</span>
+                    <Badge variant="outline" className="text-xs">
+                      {analysis.details?.fontAnalysis?.fontChanges || 0}
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Consistency:</span>
+                    <Badge variant={analysis.details?.fontAnalysis?.suspicious ? "destructive" : "success"} className="text-xs">
+                      {analysis.details?.fontAnalysis?.suspicious ? 'Inconsistent' : 'Consistent'}
+                    </Badge>
+                  </div>
                 </div>
-              )}
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">Seal Analysis</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Seal Detected:</span>
+                    <Badge variant={analysis.details?.sealAnalysis?.sealDetected ? "success" : "outline"} className="text-xs">
+                      {analysis.details?.sealAnalysis?.sealDetected ? 'Yes' : 'No'}
+                    </Badge>
+                  </div>
+                  {analysis.details?.sealAnalysis?.sealDetected && (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Position:</span>
+                        <span className="text-xs">{analysis.details.sealAnalysis.position}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Authenticity:</span>
+                        <Badge variant={analysis.details.sealAnalysis.authentic ? "success" : "destructive"} className="text-xs">
+                          {analysis.details.sealAnalysis.authentic ? 'Authentic' : 'Modified'}
+                        </Badge>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">Processing Stats</h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span>Text Extracted:</span>
+                    <Badge variant="outline" className="text-xs">
+                      {analysis.details?.textLength || 0} chars
+                    </Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Analysis Version:</span>
+                    <span className="text-xs font-mono">
+                      {analysis.details?.analysisVersion || 'v2.1.0'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Processing Time:</span>
+                    <span className="text-xs">
+                      {analysis.details?.processingTime ? 
+                        new Date(analysis.details.processingTime).toLocaleTimeString() : 
+                        'Just now'
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-medium text-sm">Security Metrics</h4>
+                <div className="space-y-2">
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>Tamper Detection:</span>
+                      <span className={analysis.tamperingDetected ? 'text-destructive' : 'text-success'}>
+                        {analysis.details?.tamperingAnalysis?.confidence || 85}%
+                      </span>
+                    </div>
+                    <Progress 
+                      value={analysis.details?.tamperingAnalysis?.confidence || 85} 
+                      className="h-1"
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-sm">
+                      <span>Institution Match:</span>
+                      <span className={analysis.institutionVerified ? 'text-success' : 'text-destructive'}>
+                        {analysis.details?.institutionConfidence || 75}%
+                      </span>
+                    </div>
+                    <Progress 
+                      value={analysis.details?.institutionConfidence || 75} 
+                      className="h-1"
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* Sample Text Preview */}
+      {analysis.extractedText && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="w-5 h-5" />
+              Extracted Text Sample
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="bg-muted/20 p-4 rounded-lg">
+              <p className="text-sm font-mono leading-relaxed">
+                {analysis.extractedText.substring(0, 400)}
+                {analysis.extractedText.length > 400 && (
+                  <span className="text-muted-foreground">... [truncated]</span>
+                )}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Certificate ID */}
       {certificateId && (

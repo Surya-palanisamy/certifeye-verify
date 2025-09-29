@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/enhanced-button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Loader as Loader2 } from 'lucide-react';
+import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle } from 'lucide-react';
 import { analyzeCertificate } from '@/services/certificateAnalyzer';
 import { toast } from '@/components/ui/sonner';
+import AnalysisLoader from './AnalysisLoader';
 
 const CertificateUpload = ({ onUploadComplete }) => {
   const [file, setFile] = useState(null);
@@ -53,6 +54,10 @@ const CertificateUpload = ({ onUploadComplete }) => {
     } finally {
       setUploading(false);
     }
+  };
+
+  const handleAnalysisComplete = () => {
+    // Analysis loader will handle completion
   };
 
   return (
@@ -138,19 +143,16 @@ const CertificateUpload = ({ onUploadComplete }) => {
             className="w-full"
             variant="hero"
           >
-            {uploading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Analyzing Certificate...
-              </>
-            ) : (
-              <>
-                <Upload className="w-4 h-4 mr-2" />
-                Upload & Verify Certificate
-              </>
-            )}
+            <Upload className="w-4 h-4 mr-2" />
+            Upload & Verify Certificate
           </Button>
         )}
+
+        {/* Analysis Loader */}
+        <AnalysisLoader 
+          isLoading={uploading} 
+          onComplete={handleAnalysisComplete}
+        />
       </CardContent>
     </Card>
   );
