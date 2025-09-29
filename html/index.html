@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduSeal - Certificate Verification</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header class="main-header">
+        <nav class="main-nav">
+            <a href="#" class="logo">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L3 7V17L12 22L21 17V7L12 2ZM5 8.5L12 12.5L19 8.5V15.5L12 19.5L5 15.5V8.5Z" fill="#5E72E4"/>
+                </svg>
+                <span>EduSeal</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#">Features</a></li>
+                <li><a href="#">How It Works</a></li>
+                <li><a href="#">Security</a></li>
+                <li><a href="#">Pricing</a></li>
+            </ul>
+            <button class="btn btn-primary get-started-btn">Get Started</button>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home-section" class="content-section active">
+            <div class="glitch-background">
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+                <div class="glitch-line"></div>
+            </div>
+            <div class="home-content">
+                <h1>Secure Certificate Verification</h1>
+                <p class="subtitle">Instantly verify the authenticity of any document with our AI-powered platform.</p>
+                <button class="btn btn-primary btn-large get-started-btn">Verify a Document Now</button>
+            </div>
+        </section>
+
+        <section id="verification-section" class="content-section">
+            <a href="#" class="back-link" id="back-to-home">&larr; Back to Home</a>
+            <h1>Certificate Verification</h1>
+            <p class="subtitle">Upload your certificate for AI-powered verification and analysis</p>
+
+            <div class="upload-container">
+                <h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Upload Certificate for Verification
+                </h2>
+                <div id="drop-zone" class="drop-zone">
+                    <div class="drop-zone-prompt">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        <p><strong>Drag and drop your certificate here</strong></p>
+                        <p class="light-text">or click to browse files</p>
+                        <button id="browse-btn" class="btn btn-secondary">Browse Files</button>
+                    </div>
+                    <input type="file" id="file-input" accept=".pdf,.jpg,.jpeg,.png" hidden>
+                </div>
+                <div class="file-info">
+                    <p><span class="status-ok">&#10003;</span> Supported formats: PDF, JPG, PNG</p>
+                    <p><span class="status-info">&#9432;</span> Maximum file size: 10MB</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="analysis-section" class="content-section">
+            <h2 id="file-name-display">Analyzing your_file.pdf...</h2>
+            <div class="loader"></div>
+            <p id="analysis-status" class="analysis-status-text">Preparing analysis...</p>
+        </section>
+        
+        <section id="results-section" class="content-section">
+             <div class="result-header">
+                <h2>Verification Result</h2>
+                <button class="btn btn-secondary" id="verify-another-btn">Verify Another Document</button>
+            </div>
+            <div class="results-grid">
+                <div class="result-card verdict">
+                    <h3>Verdict</h3>
+                    <p id="verdict-text" class="verdict-real">✓ Real</p>
+                    <span class="verdict-subtext">This document appears to be authentic.</span>
+                </div>
+                <div class="result-card analysis-summary">
+                    <h3>Analysis Summary</h3>
+                    <ul>
+                        <li><span>Text Consistency:</span> <strong id="summary-text" class="status-ok">Passed</strong></li>
+                        <li><span>Tampering Scan:</span> <strong id="summary-tampering" class="status-ok">Passed</strong></li>
+                        <li><span>Digital Signature:</span> <strong id="summary-signature" class="status-warn">Not Found</strong></li>
+                        <li><span>Format Analysis:</span> <strong id="summary-format" class="status-ok">Passed</strong></li>
+                    </ul>
+                </div>
+                <div class="result-card chart-container">
+                    <h3 id="chart-title">Authenticity Score: 95%</h3>
+                    <canvas id="authenticityChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Section Elements
+            const homeSection = document.getElementById('home-section');
+            const verificationSection = document.getElementById('verification-section');
+            const analysisSection = document.getElementById('analysis-section');
+            const resultsSection = document.getElementById('results-section');
+            const allSections = document.querySelectorAll('.content-section');
+
+            // Button & Interaction Elements
+            const getStartedBtns = document.querySelectorAll('.get-started-btn');
+            const backToHomeBtn = document.getElementById('back-to-home');
+            const dropZone = document.getElementById('drop-zone');
+            const fileInput = document.getElementById('file-input');
+            const browseBtn = document.getElementById('browse-btn');
+            const verifyAnotherBtn = document.getElementById('verify-another-btn');
+
+            // Display Elements
+            const fileNameDisplay = document.getElementById('file-name-display');
+            const analysisStatus = document.getElementById('analysis-status');
+            let authenticityChart = null;
+            
+            // --- Event Listeners ---
+
+            getStartedBtns.forEach(btn => {
+                btn.addEventListener('click', () => showSection('verification'));
+            });
+
+            backToHomeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                showSection('home');
+            });
+            
+            browseBtn.addEventListener('click', () => fileInput.click());
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) handleFile(fileInput.files[0]);
+            });
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
+                    if (allowedTypes.includes(file.type)) {
+                        fileInput.files = e.dataTransfer.files;
+                        handleFile(file);
+                    } else {
+                        alert('Invalid file type. Please upload a PDF, JPG, or PNG.');
+                    }
+                }
+            });
+            
+            verifyAnotherBtn.addEventListener('click', () => {
+                showSection('verification');
+                fileInput.value = ''; // Reset file input
+            });
+
+            // --- Core Functions ---
+
+            function showSection(sectionId) {
+                allSections.forEach(section => section.classList.remove('active'));
+                document.getElementById(`${sectionId}-section`).classList.add('active');
+            }
+
+            function handleFile(file) {
+                fileNameDisplay.textContent = `Analyzing ${file.name}...`;
+                showSection('analysis');
+                simulateAnalysis();
+            }
+
+            function simulateAnalysis() {
+                const statuses = [
+                    'Extracting text and images...',
+                    'Scanning for digital tampering...',
+                    'Analyzing layout consistency...',
+                    'Cross-referencing templates...',
+                    'Verifying digital signatures...',
+                    'Finalizing report...'
+                ];
+                
+                let currentStatus = 0;
+                analysisStatus.textContent = statuses[currentStatus];
+
+                const interval = setInterval(() => {
+                    currentStatus++;
+                    if (currentStatus < statuses.length) {
+                        analysisStatus.textContent = statuses[currentStatus];
+                    } else {
+                        clearInterval(interval);
+                        displayResults();
+                    }
+                }, 1200);
+            }
+
+            function displayResults() {
+                showSection('results');
+                
+                const isReal = Math.random() > 0.3; // 70% chance of being real
+                
+                const verdictEl = document.getElementById('verdict-text');
+                const verdictSubtextEl = document.querySelector('.verdict-subtext');
+                const tamperingStatusEl = document.getElementById('summary-tampering');
+
+                if (isReal) {
+                    verdictEl.textContent = '✓ Real';
+                    verdictEl.className = 'verdict-text verdict-real';
+                    verdictSubtextEl.textContent = 'This document appears to be authentic and has not been tampered with.';
+                    tamperingStatusEl.className = 'status-ok';
+                    tamperingStatusEl.textContent = 'Passed';
+                } else {
+                    verdictEl.textContent = '✗ Fake';
+                    verdictEl.className = 'verdict-text verdict-fake';
+                    verdictSubtextEl.textContent = 'This document shows signs of tampering or is inconsistent with our records.';
+                    tamperingStatusEl.className = 'status-danger';
+                    tamperingStatusEl.textContent = 'Failed';
+                }
+
+                const authenticityScore = isReal ? Math.floor(Math.random() * 15) + 85 : Math.floor(Math.random() * 40) + 20;
+                renderAuthenticityChart(authenticityScore);
+            }
+
+            function renderAuthenticityChart(score) {
+                const ctx = document.getElementById('authenticityChart').getContext('2d');
+                
+                if (authenticityChart) {
+                    authenticityChart.destroy();
+                }
+
+                document.getElementById('chart-title').textContent = `Authenticity Score: ${score}%`;
+
+                authenticityChart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        datasets: [{
+                            data: [score, 100 - score],
+                            backgroundColor: ['#5E72E4', '#2D3748'],
+                            borderWidth: 0,
+                            borderRadius: 5,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '75%',
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                    }
+                });
+            }
+
+            // --- Initial State ---
+            showSection('home');
+        });
+    </script>
+</body>
+</html>

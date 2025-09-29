@@ -1,19 +1,23 @@
-import React, { useState, useEffect } from 'react';
-import { Progress } from '@/components/ui/progress';
-import { Card, CardContent } from '@/components/ui/card';
-import { Shield, Eye, QrCode, Building, FileText, Cpu } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent } from "@/components/ui/card";
+import { Shield, Eye, QrCode, Building, FileText, Cpu } from "lucide-react";
 
 const AnalysisLoader = ({ isLoading, onComplete }) => {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
 
   const analysisSteps = [
-    { icon: FileText, label: 'Extracting text content...', duration: 1500 },
-    { icon: Eye, label: 'Analyzing digital signatures...', duration: 2000 },
-    { icon: Cpu, label: 'Detecting tampering patterns...', duration: 1800 },
-    { icon: Building, label: 'Verifying institution database...', duration: 1200 },
-    { icon: QrCode, label: 'Scanning QR codes...', duration: 1000 },
-    { icon: Shield, label: 'Generating security report...', duration: 800 }
+    { icon: FileText, label: "Extracting text content...", duration: 1500 },
+    { icon: Eye, label: "Analyzing digital signatures...", duration: 2000 },
+    { icon: Cpu, label: "Detecting tampering patterns...", duration: 1800 },
+    {
+      icon: Building,
+      label: "Verifying institution database...",
+      duration: 1200,
+    },
+    { icon: QrCode, label: "Scanning QR codes...", duration: 1000 },
+    { icon: Shield, label: "Generating security report...", duration: 800 },
   ];
 
   useEffect(() => {
@@ -23,48 +27,38 @@ const AnalysisLoader = ({ isLoading, onComplete }) => {
       return;
     }
 
-    let totalDuration = 0;
-    let currentDuration = 0;
-    
-    // Calculate total duration
-    analysisSteps.forEach(step => {
-      totalDuration += step.duration;
-    });
+    let totalDuration = analysisSteps.reduce(
+      (sum, step) => sum + step.duration,
+      0
+    );
 
     const runSteps = async () => {
+      let currentDuration = 0;
       for (let i = 0; i < analysisSteps.length; i++) {
         setCurrentStep(i);
-        
         const stepDuration = analysisSteps[i].duration;
-        const stepProgress = (stepDuration / totalDuration) * 100;
-        
-        // Animate progress for this step
         const startProgress = (currentDuration / totalDuration) * 100;
-        const endProgress = ((currentDuration + stepDuration) / totalDuration) * 100;
-        
-        let startTime: number | null = null;
-        
-        const animateStep = (timestamp: number) => {
+        const endProgress =
+          ((currentDuration + stepDuration) / totalDuration) * 100;
+
+        let startTime = null;
+        const animateStep = (timestamp) => {
           if (!startTime) startTime = timestamp;
           const elapsed = timestamp - startTime;
           const stepComplete = Math.min(elapsed / stepDuration, 1);
-          
-          const currentProgress = startProgress + (stepProgress * stepComplete);
+          const currentProgress =
+            startProgress + (endProgress - startProgress) * stepComplete;
           setProgress(currentProgress);
-          
           if (stepComplete < 1) {
             requestAnimationFrame(animateStep);
           }
         };
-        
         requestAnimationFrame(animateStep);
-        
-        // Wait for step to complete
-        await new Promise(resolve => setTimeout(resolve, stepDuration));
+
+        await new Promise((resolve) => setTimeout(resolve, stepDuration));
         currentDuration += stepDuration;
       }
-      
-      // Complete
+
       setProgress(100);
       setTimeout(() => {
         onComplete?.();
@@ -75,7 +69,6 @@ const AnalysisLoader = ({ isLoading, onComplete }) => {
   }, [isLoading]);
 
   if (!isLoading) return null;
-
   const CurrentIcon = analysisSteps[currentStep]?.icon || Shield;
 
   return (
@@ -83,9 +76,11 @@ const AnalysisLoader = ({ isLoading, onComplete }) => {
       <Card className="w-full max-w-md mx-4">
         <CardContent className="pt-6">
           <div className="space-y-6">
-            {/* Circular Progress */}
             <div className="relative w-32 h-32 mx-auto">
-              <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+              <svg
+                className="w-32 h-32 transform -rotate-90"
+                viewBox="0 0 120 120"
+              >
                 <circle
                   cx="60"
                   cy="60"
@@ -103,7 +98,9 @@ const AnalysisLoader = ({ isLoading, onComplete }) => {
                   fill="none"
                   strokeLinecap="round"
                   strokeDasharray={`${2 * Math.PI * 50}`}
-                  strokeDashoffset={`${2 * Math.PI * 50 * (1 - progress / 100)}`}
+                  strokeDashoffset={`${
+                    2 * Math.PI * 50 * (1 - progress / 100)
+                  }`}
                   className="transition-all duration-300 ease-out"
                 />
               </svg>
@@ -116,7 +113,6 @@ const AnalysisLoader = ({ isLoading, onComplete }) => {
               </div>
             </div>
 
-            {/* Current Step */}
             <div className="text-center space-y-3">
               <div className="flex justify-center">
                 <CurrentIcon className="w-8 h-8 text-primary animate-pulse" />
@@ -129,29 +125,14 @@ const AnalysisLoader = ({ isLoading, onComplete }) => {
               </div>
             </div>
 
-            {/* Progress Bar */}
             <div className="space-y-2">
               <Progress value={progress} className="h-2" />
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Step {currentStep + 1} of {analysisSteps.length}</span>
+                <span>
+                  Step {currentStep + 1} of {analysisSteps.length}
+                </span>
                 <span>{Math.round(progress)}% Complete</span>
               </div>
-            </div>
-
-            {/* Step Indicators */}
-            <div className="flex justify-center space-x-2">
-              {analysisSteps.map((step, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                    index < currentStep
-                      ? 'bg-primary'
-                      : index === currentStep
-                      ? 'bg-primary animate-pulse'
-                      : 'bg-muted'
-                  }`}
-                />
-              ))}
             </div>
           </div>
         </CardContent>

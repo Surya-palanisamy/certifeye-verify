@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/enhanced-button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle } from 'lucide-react';
-import { analyzeCertificate } from '@/services/certificateAnalyzer';
-import { toast } from '@/components/ui/sonner';
-import AnalysisLoader from './AnalysisLoader';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/enhanced-button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Upload,
+  FileText,
+  CircleAlert as AlertCircle,
+  CircleCheck as CheckCircle,
+} from "lucide-react";
+import { analyzeCertificate } from "@/services/certificateAnalyzer";
+import { toast } from "@/components/ui/sonner";
+import AnalysisLoader from "./AnalysisLoader";
+import AnalysisResults from "./AnalysisResults";
 
-const CertificateUpload = ({ onUploadComplete }) => {
+const CertificateUpload = () => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
+  const [result, setResult] = useState(null); // ✅ store analysis result
+  const [loadingDone, setLoadingDone] = useState(false); // ✅ track loader completion
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -25,7 +33,7 @@ const CertificateUpload = ({ onUploadComplete }) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setFile(e.dataTransfer.files[0]);
     }
@@ -39,26 +47,39 @@ const CertificateUpload = ({ onUploadComplete }) => {
 
   const handleUpload = async () => {
     if (!file) {
-      toast.error('Please select a file first');
+      toast.error("Please select a file first");
       return;
     }
 
     setUploading(true);
+    setLoadingDone(false);
+
     try {
-      const result = await analyzeCertificate(file);
-      toast.success('Certificate analyzed successfully!');
-      onUploadComplete?.(result);
-      setFile(null);
+      const res = await analyzeCertificate(file);
+      setResult(res); // ✅ save result
+      toast.success("Certificate analyzed successfully!");
     } catch (error) {
-      toast.error('Failed to analyze certificate: ' + error.message);
-    } finally {
-      setUploading(false);
+      toast.error("Failed to analyze certificate: " + error.message);
     }
   };
 
-  const handleAnalysisComplete = () => {
-    // Analysis loader will handle completion
+  const handleCloseResults = () => {
+    setResult(null);
+    setFile(null);
+    setUploading(false);
+    setLoadingDone(false);
   };
+
+  // ✅ If loader finished AND result exists → show results
+  if (loadingDone && result) {
+    return (
+      <AnalysisResults
+        result={result}
+        certificateId={"CERT-" + Date.now()}
+        onClose={handleCloseResults}
+      />
+    );
+  }
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
@@ -69,11 +90,12 @@ const CertificateUpload = ({ onUploadComplete }) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
+        {/* Drag & Drop Zone */}
         <div
           className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
             dragActive
-              ? 'border-primary bg-primary/5'
-              : 'border-muted-foreground/25 hover:border-primary/50'
+              ? "border-primary bg-primary/5"
+              : "border-muted-foreground/25 hover:border-primary/50"
           }`}
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
@@ -117,7 +139,11 @@ const CertificateUpload = ({ onUploadComplete }) => {
                 disabled={uploading}
               />
               <label htmlFor="file-upload">
-                <Button variant="outline" className="cursor-pointer" disabled={uploading}>
+                <Button
+                  variant="outline"
+                  className="cursor-pointer"
+                  disabled={uploading}
+                >
                   Browse Files
                 </Button>
               </label>
@@ -125,6 +151,7 @@ const CertificateUpload = ({ onUploadComplete }) => {
           )}
         </div>
 
+        {/* Info Text */}
         <div className="text-sm text-muted-foreground space-y-2">
           <p className="flex items-center gap-2">
             <CheckCircle className="w-4 h-4 text-success" />
@@ -136,6 +163,7 @@ const CertificateUpload = ({ onUploadComplete }) => {
           </p>
         </div>
 
+        {/* Upload Button */}
         {file && (
           <Button
             onClick={handleUpload}
@@ -148,11 +176,13 @@ const CertificateUpload = ({ onUploadComplete }) => {
           </Button>
         )}
 
-        {/* Analysis Loader */}
-        <AnalysisLoader 
-          isLoading={uploading} 
-          onComplete={handleAnalysisComplete}
-        />
+        {/* Loader */}
+        {uploading && (
+          <AnalysisLoader
+            isLoading={uploading}
+            onComplete={() => setLoadingDone(true)} // ✅ when 100%, mark done
+          />
+        )}
       </CardContent>
     </Card>
   );
