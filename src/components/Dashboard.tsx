@@ -2,16 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/enhanced-button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  FileText, 
-  CheckCircle, 
-  XCircle, 
-  Clock, 
-  TrendingUp,
-  Eye,
-  Download,
-  RefreshCw
-} from 'lucide-react';
+import { FileText, CircleCheck as CheckCircle, Circle as XCircle, Clock, TrendingUp, Eye, Download, RefreshCw } from 'lucide-react';
 import { getAllCertificates, getStats } from '@/services/api';
 import { toast } from '@/components/ui/sonner';
 

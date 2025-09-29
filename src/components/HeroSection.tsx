@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/enhanced-button";
-import { CheckCircle, Upload, Shield, Search } from "lucide-react";
+import { CircleCheck as CheckCircle, Upload, Shield, Search } from "lucide-react";
 import heroBackground from "@/assets/hero-background.jpg";
 
 const HeroSection = ({ onGetStarted }) => {

@@ -2,17 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { 
-  CheckCircle, 
-  XCircle, 
-  AlertTriangle, 
-  Shield, 
-  Eye, 
-  QrCode, 
-  Building,
-  FileText,
-  TrendingUp
-} from 'lucide-react';
+import { CircleCheck as CheckCircle, Circle as XCircle, TriangleAlert as AlertTriangle, Shield, Eye, QrCode, Building, FileText, TrendingUp } from 'lucide-react';
 
 const AnalysisResults = ({ analysis, certificateId }) => {
   if (!analysis) return null;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/enhanced-button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Upload, FileText, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Loader as Loader2 } from 'lucide-react';
 import { uploadCertificate } from '@/services/api';
 import { toast } from '@/components/ui/sonner';
 
