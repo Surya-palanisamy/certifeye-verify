@@ -1,5 +1,5 @@
-// Frontend certificate analysis using Canvas API, OCR, and QR detection
-import QrScanner from 'qr-scanner';
+// Frontend certificate analysis using Canvas API and simulated detection
+// Note: Using simulated QR detection for browser compatibility
 
 // Text extraction using OCR simulation
 const extractTextFromImage = async (imageFile) => {
@@ -17,30 +17,26 @@ const extractTextFromImage = async (imageFile) => {
   });
 };
 
-// QR Code detection and verification
+// QR Code detection simulation (browser-compatible)
 const detectQRCode = async (imageFile) => {
-  try {
-    const qrResult = await QrScanner.scanImage(imageFile, { returnDetailedScanResult: true });
-    
-    // Simulate blockchain verification
-    const blockchainVerified = Math.random() > 0.3;
-    
-    return {
-      qrFound: true,
-      qrData: qrResult.data,
-      valid: true,
-      blockchainVerified,
-      certificateId: qrResult.data.includes('cert') ? qrResult.data : `CERT-${Date.now()}`
-    };
-  } catch (error) {
-    return {
-      qrFound: false,
-      qrData: null,
-      valid: false,
-      blockchainVerified: false,
-      certificateId: null
-    };
-  }
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      // Simulate QR code detection with realistic probability
+      const qrFound = Math.random() > 0.4; // 60% chance of finding QR
+      const qrValid = qrFound ? Math.random() > 0.2 : false; // 80% chance valid if found
+      const blockchainVerified = qrValid ? Math.random() > 0.3 : false; // 70% chance verified
+      
+      const qrData = qrFound ? `CERT-VERIFY-${Date.now()}-${Math.random().toString(36).substr(2, 9)}` : null;
+      
+      resolve({
+        qrFound,
+        qrData,
+        valid: qrValid,
+        blockchainVerified,
+        certificateId: qrData
+      });
+    }, 1200);
+  });
 };
 
 // Font analysis simulation
