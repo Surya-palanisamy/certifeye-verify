@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/enhanced-button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload, FileText, CircleAlert as AlertCircle, CircleCheck as CheckCircle, Loader as Loader2 } from 'lucide-react';
-import { uploadCertificate } from '@/services/api';
+import { analyzeCertificate } from '@/services/certificateAnalyzer';
 import { toast } from '@/components/ui/sonner';
 
 const CertificateUpload = ({ onUploadComplete }) => {
@@ -44,12 +44,12 @@ const CertificateUpload = ({ onUploadComplete }) => {
 
     setUploading(true);
     try {
-      const result = await uploadCertificate(file);
-      toast.success('Certificate uploaded and analyzed successfully!');
+      const result = await analyzeCertificate(file);
+      toast.success('Certificate analyzed successfully!');
       onUploadComplete?.(result);
       setFile(null);
     } catch (error) {
-      toast.error('Failed to upload certificate: ' + error.message);
+      toast.error('Failed to analyze certificate: ' + error.message);
     } finally {
       setUploading(false);
     }

@@ -9,7 +9,7 @@ const AnalysisResults = ({ analysis, certificateId }) => {
 
   const getStatusIcon = (isAuthentic) => {
     if (isAuthentic) {
-      return <CheckCircle className="w-5 h-5 text-success" />;
+      return <CheckCircle className="w-5 h-5 text-emerald-600" />;
     }
     return <XCircle className="w-5 h-5 text-destructive" />;
   };
@@ -18,11 +18,60 @@ const AnalysisResults = ({ analysis, certificateId }) => {
     return isAuthentic ? 'success' : 'destructive';
   };
 
+  const getRiskLevel = (fraudScore) => {
+    if (fraudScore < 30) return { level: 'LOW', color: 'success', description: 'Certificate appears authentic' };
+    if (fraudScore < 60) return { level: 'MEDIUM', color: 'warning', description: 'Some suspicious elements detected' };
+    return { level: 'HIGH', color: 'destructive', description: 'High probability of fraud' };
+  };
+
+  const getContributingFactors = (analysis) => {
+    const factors = [];
+    
+    if (analysis.tamperingDetected) {
+      factors.push({ type: 'negative', text: 'Digital tampering detected in document', weight: 'High Impact' });
+    } else {
+      factors.push({ type: 'positive', text: 'No digital tampering detected', weight: 'High Impact' });
+    }
+    
+    if (analysis.institutionVerified) {
+      factors.push({ type: 'positive', text: 'Institution found in verified database', weight: 'High Impact' });
+    } else {
+      factors.push({ type: 'negative', text: 'Institution not verified or unknown', weight: 'Medium Impact' });
+    }
+    
+    if (analysis.qrCodeValid) {
+      factors.push({ type: 'positive', text: 'Valid QR code with authentic signature', weight: 'Medium Impact' });
+    } else {
+      factors.push({ type: 'negative', text: 'No valid QR code found', weight: 'Low Impact' });
+    }
+    
+    if (analysis.blockchainVerified) {
+      factors.push({ type: 'positive', text: 'Blockchain verification successful', weight: 'High Impact' });
+    }
+    
+    if (analysis.details?.fontAnalysis?.suspicious) {
+      factors.push({ type: 'negative', text: 'Inconsistent font patterns detected', weight: 'Medium Impact' });
+    } else {
+      factors.push({ type: 'positive', text: 'Font patterns appear consistent', weight: 'Low Impact' });
+    }
+    
+    if (analysis.details?.sealAnalysis?.authentic === false) {
+      factors.push({ type: 'negative', text: 'Official seal appears modified or fake', weight: 'High Impact' });
+    } else if (analysis.details?.sealAnalysis?.authentic === true) {
+      factors.push({ type: 'positive', text: 'Official seal appears authentic', weight: 'High Impact' });
+    }
+    
+    return factors;
+  };
+
   const getConfidenceColor = (confidence) => {
     if (confidence >= 80) return 'text-success';
     if (confidence >= 60) return 'text-warning';
     return 'text-destructive';
   };
+
+  const riskLevel = getRiskLevel(analysis.fraudScore);
+  const contributingFactors = getContributingFactors(analysis);
 
   return (
     <div className="space-y-6">
@@ -38,24 +87,69 @@ const AnalysisResults = ({ analysis, certificateId }) => {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Confidence Score</span>
-              <span className={`text-lg font-bold ${getConfidenceColor(analysis.confidence)}`}>
-                {analysis.confidence}%
-              </span>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium">Authenticity</span>
+                <span className={`text-lg font-bold ${analysis.isAuthentic ? 'text-emerald-600' : 'text-red-600'}`}>
+                  {analysis.isAuthentic ? 'REAL' : 'FAKE'}
+                </span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {analysis.isAuthentic ? 'Certificate appears genuine' : 'Certificate shows signs of fraud'}
+              </div>
             </div>
-            <Progress value={analysis.confidence} className="h-3" />
+            
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium">Confidence</span>
+                <span className={`text-lg font-bold ${getConfidenceColor(analysis.confidence)}`}>
+                  {analysis.confidence}%
+                </span>
+              </div>
+              <Progress value={analysis.confidence} className="h-2" />
+            </div>
+            
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-sm font-medium">Risk Level</span>
+                <Badge variant={riskLevel.color as "success" | "warning" | "destructive"} className="text-xs">
+                  {riskLevel.level}
+                </Badge>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {riskLevel.description}
+              </div>
+            </div>
           </div>
-          
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium">Fraud Risk Score</span>
-              <span className="text-lg font-bold text-destructive">
-                {analysis.fraudScore}%
-              </span>
-            </div>
-            <Progress value={analysis.fraudScore} className="h-3" />
+        </CardContent>
+      </Card>
+
+      {/* Contributing Factors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" />
+            Contributing Factors Analysis
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {contributingFactors.map((factor, index) => (
+              <div key={index} className="flex items-center justify-between p-3 rounded-lg border">
+                <div className="flex items-center gap-3">
+                  {factor.type === 'positive' ? (
+                    <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  ) : (
+                    <XCircle className="w-4 h-4 text-red-600" />
+                  )}
+                  <span className="text-sm">{factor.text}</span>
+                </div>
+                <Badge variant="outline" className="text-xs">
+                  {factor.weight}
+                </Badge>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
